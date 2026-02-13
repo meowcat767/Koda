@@ -18,6 +18,34 @@ public class EditorApp extends Application {
         VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(codeArea);
         codeArea.addEventFilter(KeyEvent.KEY_TYPED, event -> {
             String ch = event.getCharacter();
+            if (ch.equals("\r") || ch.equals("\n")) {
+                int pos = codeArea.getCaretPosition();
+                int currentParagraph = codeArea.getCurrentParagraph();
+                String textBeforeCaret = codeArea.getParagraph(currentParagraph).getText().substring(0, codeArea.getCaretColumn());
+
+                StringBuilder indent = new StringBuilder();
+                for (char c : textBeforeCaret.toCharArray()) {
+                    if (Character.isWhitespace(c)) {
+                        indent.append(c);
+                    } else {
+                        break;
+                    }
+                }
+
+                boolean extraIndent = textBeforeCaret.trim().endsWith("{");
+                String textAfterCaret = codeArea.getParagraph(currentParagraph).getText().substring(codeArea.getCaretColumn());
+                boolean betweenBraces = extraIndent && textAfterCaret.trim().startsWith("}");
+
+                if (betweenBraces) {
+                    codeArea.insertText(pos, "\n" + indent.toString() + "    \n" + indent.toString());
+                    codeArea.moveTo(pos + indent.length() + 5);
+                } else {
+                    String newIndent = indent.toString() + (extraIndent ? "    " : "");
+                    codeArea.insertText(pos, "\n" + newIndent);
+                }
+                event.consume();
+                return;
+            }
             switch (ch) {
                 case "(" -> {
                     pair(codeArea, "(", ")");
