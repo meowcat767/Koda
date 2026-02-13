@@ -12,6 +12,7 @@ public class EditorApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         CodeArea codeArea = new CodeArea();
+        codeArea.getStyleClass().add("codeArea");
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
         VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(codeArea);
         Java jsyntax = new Java();
