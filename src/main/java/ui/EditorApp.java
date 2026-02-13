@@ -3,13 +3,17 @@ package ui;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import syntax.Java;
+import org.fxmisc.richtext.LineNumberFactory;
 
 public class EditorApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         CodeArea codeArea = new CodeArea();
+        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+        VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(codeArea);
         Java jsyntax = new Java();
         codeArea.textProperty().addListener((obs, oldText, newText) -> {
             codeArea.setStyleSpans(0, jsyntax.computeHighlighting(newText));
