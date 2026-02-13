@@ -19,8 +19,8 @@ public class EditorApp extends Application {
             codeArea.setStyleSpans(0, jsyntax.computeHighlighting(newText));
         });
 
-        Scene scene = new Scene(codeArea, 800, 600);
-        var resource = getClass().getResource("/styles.css");
+        Scene scene = new Scene(scrollPane, 800, 600);
+        var resource = EditorApp.class.getResource("/styles.css");
         if (resource != null) {
             scene.getStylesheets().add(resource.toExternalForm());
         } else {
@@ -28,7 +28,10 @@ public class EditorApp extends Application {
         }
         stage.setTitle("Koda");
         stage.setScene(scene);
+        stage.setMaximized(true);
+        System.out.println("[DEBUG] Showing stage...");
         stage.show();
+        System.out.println("[DEBUG] Stage shown.");
     }
 
     public static void main(String[] args) {

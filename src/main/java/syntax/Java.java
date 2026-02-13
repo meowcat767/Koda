@@ -37,12 +37,18 @@ public class Java {
                                         matcher.group("NUMBER") != null ? "number" :
                                                 matcher.group("STRING") != null ? "string" :
                                                         null;
-                        spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+                        int spacer = matcher.start() - lastKwEnd;
+                        if (spacer > 0) {
+                                spansBuilder.add(Collections.emptyList(), spacer);
+                        }
                         spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
                         lastKwEnd = matcher.end();
                 }
 
-                spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+                int remaining = text.length() - lastKwEnd;
+                if (remaining > 0) {
+                        spansBuilder.add(Collections.emptyList(), remaining);
+                }
                 return spansBuilder.create();
         }
 }

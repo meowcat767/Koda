@@ -5,6 +5,8 @@ module koda {
     requires org.fxmisc.richtext;
     requires org.fxmisc.flowless;
     requires org.fxmisc.undo;
+    requires reactfx;
+    requires wellbehavedfx;
 
     exports ui;
     exports syntax;
