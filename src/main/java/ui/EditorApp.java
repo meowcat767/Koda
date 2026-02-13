@@ -2,6 +2,7 @@ package ui;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -15,6 +16,23 @@ public class EditorApp extends Application {
         codeArea.getStyleClass().add("codeArea");
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
         VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(codeArea);
+        codeArea.addEventFilter(KeyEvent.KEY_TYPED, event -> {
+            String ch = event.getCharacter();
+            switch (ch) {
+                case "(" -> {
+                    pair(codeArea, "(", ")");
+                    event.consume();
+                }
+                case "[" -> {
+                    pair(codeArea, "[", "]");
+                    event.consume();
+                }
+                case "{" -> {
+                    pair(codeArea, "{", "}");
+                    event.consume();
+                }
+            }
+        });
         Java jsyntax = new Java();
         codeArea.textProperty().addListener((obs, oldText, newText) -> {
             codeArea.setStyleSpans(0, jsyntax.computeHighlighting(newText));
@@ -33,6 +51,12 @@ public class EditorApp extends Application {
         System.out.println("[DEBUG] Showing stage...");
         stage.show();
         System.out.println("[DEBUG] Stage shown.");
+    }
+
+    private void pair(CodeArea area, String open, String close) {
+        int pos = area.getCaretPosition();
+        area.insertText(pos, open + close);
+        area.moveTo(pos + 1);
     }
 
     public static void main(String[] args) {
