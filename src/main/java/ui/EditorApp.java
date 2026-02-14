@@ -6,8 +6,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 import syntax.Java;
 import org.fxmisc.richtext.LineNumberFactory;
+
+import java.util.Collection;
 
 public class EditorApp extends Application {
     @Override
@@ -58,12 +62,14 @@ public class EditorApp extends Application {
                 case "{" -> {
                     pair(codeArea, "{", "}");
                     event.consume();
+                    autoOutdent(codeArea);
                 }
             }
         });
         Java jsyntax = new Java();
         codeArea.textProperty().addListener((obs, oldText, newText) -> {
-            codeArea.setStyleSpans(0, jsyntax.computeHighlighting(newText));
+            var spans = jsyntax.computeHighlighting(newText);
+            codeArea.setStyleSpans(0, addDefaultStyle(spans));
         });
 
         Scene scene = new Scene(scrollPane, 800, 600);
@@ -86,6 +92,47 @@ public class EditorApp extends Application {
         area.insertText(pos, open + close);
         area.moveTo(pos + 1);
     }
+
+    private void autoOutdent(CodeArea area) {
+        int paragraph = area.getCurrentParagraph();
+        int caret = area.getCaretPosition();
+        String line = area.getParagraph(paragraph).getText();
+        if(!line.trim().isEmpty()) {
+            area.insertText(caret, "");
+            return;
+        }
+        int leading = countLeadingSpaces(line);
+        int remove = Math.min(4, leading);
+        int lineStart = area.getAbsolutePosition(paragraph, 0);
+        if (remove > 0) {
+            area.deleteText(lineStart, lineStart + remove);
+            caret -= remove;
+        }
+    }
+
+    private int countLeadingSpaces(String s) {
+        int i = 0;
+        while (i < s.length() && s.charAt(i) == ' ') i++;
+        return i;
+    }
+
+    private StyleSpans<Collection<String>> addDefaultStyle(
+            StyleSpans<Collection<String>> original) {
+
+        StyleSpansBuilder<Collection<String>> builder =
+                new StyleSpansBuilder<>();
+
+        original.forEach(span -> {
+            var styles = span.getStyle().isEmpty()
+                    ? java.util.List.of("plain")
+                    : span.getStyle();
+
+            builder.add(styles, span.getLength());
+        });
+
+        return builder.create();
+    }
+
 
     public static void main(String[] args) {
         launch(args);

@@ -24,7 +24,16 @@
 
 .code-area {
     -fx-background-color: #2b2b2b;
+}
+
+.code-area .text-area{
+    -fx-text-fill: white;
+}
+
+.plain {
     -fx-fill: white;
 }
+
+
 
 
