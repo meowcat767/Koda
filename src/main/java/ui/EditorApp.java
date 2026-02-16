@@ -60,9 +60,30 @@ public class EditorApp extends Application {
                     event.consume();
                 }
                 case "{" -> {
-                    pair(codeArea, "{", "}");
+                    int pos = codeArea.getCaretPosition();
+                    int currentParagraph = codeArea.getCurrentParagraph();
+
+                    // Get leading whitespace of current line
+                    String lineText = codeArea.getParagraph(currentParagraph).getText();
+                    StringBuilder indent = new StringBuilder();
+                    for (char c : lineText.toCharArray()) {
+                        if (Character.isWhitespace(c)) indent.append(c);
+                        else break;
+                    }
+
+                    // Insert opening brace, newline + indent, closing brace
+                    String insert = "{\n" + indent + "    \n" + indent + "}";
+                    codeArea.insertText(pos, insert);
+
+                    // Move caret to the indented line
+                    codeArea.moveTo(pos + indent.length() + 5);
+
+                    // Prevent default pair logic from running
                     event.consume();
-                    autoOutdent(codeArea);
+                }
+                case "\""  -> {
+                    pair(codeArea, "\"", "\"");
+                    event.consume();
                 }
             }
         });
@@ -93,22 +114,7 @@ public class EditorApp extends Application {
         area.moveTo(pos + 1);
     }
 
-    private void autoOutdent(CodeArea area) {
-        int paragraph = area.getCurrentParagraph();
-        int caret = area.getCaretPosition();
-        String line = area.getParagraph(paragraph).getText();
-        if(!line.trim().isEmpty()) {
-            area.insertText(caret, "");
-            return;
-        }
-        int leading = countLeadingSpaces(line);
-        int remove = Math.min(4, leading);
-        int lineStart = area.getAbsolutePosition(paragraph, 0);
-        if (remove > 0) {
-            area.deleteText(lineStart, lineStart + remove);
-            caret -= remove;
-        }
-    }
+
 
     private int countLeadingSpaces(String s) {
         int i = 0;
@@ -122,16 +128,22 @@ public class EditorApp extends Application {
         StyleSpansBuilder<Collection<String>> builder =
                 new StyleSpansBuilder<>();
 
-        original.forEach(span -> {
-            var styles = span.getStyle().isEmpty()
-                    ? java.util.List.of("plain")
-                    : span.getStyle();
+        if (original == null || original.length() == 0) {
+            builder.add(java.util.List.of("plain"), 0);
+        }
+        else {
+            original.forEach(span -> {
+                var styles = span.getStyle().isEmpty()
+                        ? java.util.List.of("plain")
+                        : span.getStyle();
 
-            builder.add(styles, span.getLength());
-        });
+                builder.add(styles, span.getLength());
+            });
+        }
 
         return builder.create();
     }
+
 
 
     public static void main(String[] args) {
