@@ -10,7 +10,7 @@
     -fx-text-background-color: white;
 }
 
-.keyword { -fx-fill: blue; -fx-font-weight: bold;}
+.keyword { -fx-fill: #9a630a; -fx-font-weight: bold;}
 .number { -fx-fill: red; }
 .string {-fx-fill: green;}
 
