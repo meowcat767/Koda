@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.fxmisc.flowless</groupId>
             <artifactId>flowless</artifactId>
-            <version>0.7.3</version>
+            <version>0.7.4</version>
         </dependency>
 
         <!-- WellBehavedFX (needed by RichTextFX) -->
