@@ -7,6 +7,7 @@ module koda {
     requires org.fxmisc.undo;
     requires reactfx;
     requires wellbehavedfx;
+    requires java.desktop;
 
     exports ui;
     exports syntax;

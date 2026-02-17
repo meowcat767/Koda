@@ -3,6 +3,7 @@ package ui;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -93,7 +94,14 @@ public class EditorApp extends Application {
             codeArea.setStyleSpans(0, addDefaultStyle(spans));
         });
 
-        Scene scene = new Scene(scrollPane, 800, 600);
+        // Wrap existing code area scroll pane in a BorderPane
+        BorderPane root = new BorderPane();
+        TopBar topBar = new TopBar(stage, codeArea);
+        root.setTop(topBar);           // menu bar
+        root.setCenter(scrollPane);     // your editor stays exactly the same
+
+        Scene scene = new Scene(root, 800, 600);
+        stage.setScene(scene);
         var resource = EditorApp.class.getResource("/styles.css");
         if (resource != null) {
             scene.getStylesheets().add(resource.toExternalForm());
